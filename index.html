@@ -49,7 +49,7 @@
    
   /* Top element: Artist Showcase Card */
   .tile-showcase { padding:24px; background: linear-gradient(to bottom, rgba(155,89,182,0.05), transparent); flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; position: relative; }
-  .track-meta { min-width: 0; padding-right: 40px; /* Ruimte voor de badge */ }
+  .track-meta { min-width: 0; padding-right: 40px; }
   .tile-title { font-size:1.3rem; font-weight:700; line-height: 1.2; margin-bottom: 6px; color: #fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .tile-artist { font-size:0.95rem; color:var(--purple-glow); font-weight: 500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
    
@@ -69,127 +69,25 @@
   .embed-container { width:100%; background:rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.05); }
 
   /* BADGE SYSTEM CSS */
-  .tier-badge {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 10px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    z-index: 10;
-    pointer-events: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  }
-  
-  .tier-silver {
-    background: linear-gradient(135deg, #a8a8a8, #d4d4d4);
-    color: #1a1a1a;
-    border: 1px solid #ffffff;
-    box-shadow: 0 0 10px rgba(212, 212, 212, 0.4);
-  }
-  
-  .tier-gold {
-    background: linear-gradient(135deg, #e6b800, #ffdd33);
-    color: #1a1a1a;
-    border: 1px solid #fff5cc;
-    box-shadow: 0 0 15px rgba(255, 221, 51, 0.5);
-  }
-  
-  .tier-legend {
-    background: linear-gradient(135deg, #00d2ff, #3a7bd5);
-    color: #ffffff;
-    border: 1px solid #80e5ff;
-    box-shadow: 0 0 20px rgba(0, 210, 255, 0.6);
-  }
+  .tier-badge { position: absolute; top: 16px; right: 16px; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; display: flex; align-items: center; gap: 4px; z-index: 10; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .tier-silver { background: linear-gradient(135deg, #a8a8a8, #d4d4d4); color: #1a1a1a; border: 1px solid #ffffff; }
+  .tier-gold { background: linear-gradient(135deg, #e6b800, #ffdd33); color: #1a1a1a; border: 1px solid #fff5cc; }
+  .tier-legend { background: linear-gradient(135deg, #00d2ff, #3a7bd5); color: #ffffff; border: 1px solid #80e5ff; }
 
   /* Modal Base */
-  .modal-bg{
-    display:none; position:fixed; inset:0; background:rgba(8,4,13,0.85);
-    backdrop-filter:blur(6px); align-items:center; justify-content:center; z-index:50; padding:20px;
-  }
+  .modal-bg{ display:none; position:fixed; inset:0; background:rgba(8,4,13,0.85); backdrop-filter:blur(6px); align-items:center; justify-content:center; z-index:50; padding:20px; }
   .modal-bg.open{ display:flex; }
-  .modal{
-    background:var(--bg-panel); border:1px solid var(--purple); border-radius:14px;
-    max-width:420px; width:100%; padding:24px; position:relative;
-  }
-  .modal-close{
-    position:absolute; top:14px; right:14px; background:none; border:none;
-    color:var(--ink-dim); font-size:20px; cursor:pointer; line-height:1;
-  }
+  .modal{ background:var(--bg-panel); border:1px solid var(--purple); border-radius:14px; max-width:420px; width:100%; padding:24px; position:relative; }
+  .modal-close{ position:absolute; top:14px; right:14px; background:none; border:none; color:var(--ink-dim); font-size:20px; cursor:pointer; line-height:1; }
   .modal-close:hover{ color:var(--ink); }
   .modal h2{ font-size:18px; margin-bottom:14px; padding-right:24px; }
-.field { margin-bottom: 18px; }
-
-.field label {
-  display: block; 
-  font-family: 'JetBrains Mono', monospace; 
-  font-size: 11px;
-  color: var(--purple-glow);
-  text-transform: uppercase; 
-  letter-spacing: 0.08em; 
-  margin-bottom: 6px;
-}
-
-.field input {
-  width: 100%; 
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(155, 89, 182, 0.4);
-  color: var(--ink); 
-  font-family: 'Space Grotesk', sans-serif; 
-  font-size: 14px;
-  padding: 11px 12px; 
-  border-radius: 7px; 
-  outline: none;
-  transition: all 0.15s ease;
-}
-
-.field input::placeholder {
-  color: #a495b8 !important;
-  opacity: 1 !important;
-}
-.field input::-webkit-input-placeholder { color: #a495b8; opacity: 1; }
-.field input::-moz-placeholder { color: #a495b8; opacity: 1; }
-
-.field input:focus { 
-  border-color: var(--purple-glow); 
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 8px rgba(214, 130, 255, 0.2);
-}
-
-.field small { 
-  display: block; 
-  margin-top: 6px; 
-  color: #bdaecf;
-  font-size: 11px; 
-  line-height: 1.4;
-}
-
-.form-error { 
-  color: var(--magenta); 
-  font-size: 12px; 
-  font-family: 'JetBrains Mono', monospace; 
-  margin-bottom: 10px; 
-  display: none; 
-}
-
-.form-success {
-  display: none; 
-  font-size: 13px; 
-  color: var(--purple-glow);
-  background: rgba(155, 89, 182, 0.08); 
-  border: 1px solid rgba(155, 89, 182, 0.3);
-  padding: 10px 12px; 
-  border-radius: 8px; 
-  margin-top: 4px;
-}
-
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--purple-glow); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .field input { width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(155, 89, 182, 0.4); color: var(--ink); font-family: 'Space Grotesk', sans-serif; font-size: 14px; padding: 11px 12px; border-radius: 7px; outline: none; }
+  .field input:focus { border-color: var(--purple-glow); background: rgba(255, 255, 255, 0.08); }
+  .field small { display: block; margin-top: 6px; color: #bdaecf; font-size: 11px; line-height: 1.4; }
+  .form-error { color: var(--magenta); font-size: 12px; font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; display: none; }
+  .form-success { display: none; font-size: 13px; color: var(--purple-glow); background: rgba(155, 89, 182, 0.08); border: 1px solid rgba(155, 89, 182, 0.3); padding: 10px 12px; border-radius: 8px; margin-top: 4px; }
   footer{ margin-top:60px; text-align:center; color:var(--ink-dim); font-size:12px; font-family:'JetBrains Mono', monospace; }
 </style>
 </head>
@@ -208,7 +106,6 @@
   </div>
 
   <div class="grid" id="grid"></div>
-  
   <footer>Live gallery, powered by chatsong Tracks appear here once reviewed and approved.</footer>
 </div>
 
@@ -232,8 +129,6 @@
         <input type="url" id="fTrackUrl" placeholder="Spotify / SoundCloud / Bandcamp / Apple Music link" required>
         <small>The music widget will automatically build from this URL.</small>
       </div>
-      
-      <!-- Hieronder staat het veld met de duidelijke uitleg -->
       <div class="field">
         <label for="fTopicUrl">Link to your forum topic</label>
         <input type="url" id="fTopicUrl" placeholder="https://community.chatsong.nl/d/..." required>
@@ -241,12 +136,12 @@
           <strong>How to get this link?</strong> <a href="https://community.chatsong.nl" target="_blank" style="color:var(--magenta); text-decoration:underline; font-weight:bold;">Open the forum here</a> and post your track. Once posted, simply copy the web address from the top of your browser and paste it here!
         </small>
       </div>
-
       <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">Submit for review</button>
       <div class="form-success" id="formSuccess">Thanks! Your track has been sent for approval.</div>
     </form>
   </div>
 </div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
   import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
@@ -263,79 +158,57 @@
 
   let votedTracks = JSON.parse(localStorage.getItem('chatsong_voted_tracks')) || [];
 
- function getEmbedHtml(url) {
+  function getEmbedHtml(url) {
     if (!url) return '<div style="padding:16px; color:var(--ink-dim); font-size:13px;">No link available</div>';
-    
     if (url.includes('spotify.com')) {
         const cleanUrl = url.split('?')[0].replace('spotify.com/', 'spotify.com/embed/');
         return `<iframe src="${cleanUrl}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" style="border-radius: 0 0 16px 16px; display:block;"></iframe>`;
     }
-    
     if (url.includes('soundcloud.com')) {
         return `<iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%239b59b6&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false" style="border-radius: 0 0 16px 16px; display:block;"></iframe>`;
     }
-    
     if (url.includes('youtu')) {
         let id = '';
         if (url.includes('v=')) { id = url.split('v=')[1].split('&')[0]; } else { id = url.split('/').pop().split('?')[0]; }
         return `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 0 0 16px 16px; display:block;"></iframe>`;
     }
-
     if (url.includes('mixcloud.com')) {
         const path = url.split('mixcloud.com')[1].split('?')[0];
         return `<iframe width="100%" height="60" src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=0&feed=${encodeURIComponent(path)}" frameborder="0" style="border-radius: 0 0 16px 16px; display:block;"></iframe>`;
     }
-    
     return `<div style="padding:16px; text-align:center;"><a href="${url}" target="_blank" style="color:var(--purple-glow); font-size:13px; text-decoration: none;">Listen to Track ↗</a></div>`;
   }
 
   window.upvoteTrack = async function(trackId, buttonElement) {
     if (votedTracks.includes(trackId)) return;
-
     try {
       const trackRef = doc(db, 'tracks', trackId);
-      await updateDoc(trackRef, {
-        likes: increment(1)
-      });
-
+      await updateDoc(trackRef, { likes: increment(1) });
       votedTracks.push(trackId);
       localStorage.setItem('chatsong_voted_tracks', JSON.stringify(votedTracks));
-      
       buttonElement.classList.add('voted');
       buttonElement.innerHTML = `✓ VOTED`;
-    } catch (error) {
-      console.error("Error upvoting track: ", error);
-    }
+    } catch (error) { console.error("Error upvoting track: ", error); }
   };
 
   onSnapshot(query(collection(db, 'tracks'), orderBy('likes', 'desc')), (snapshot) => {
     const grid = document.getElementById('grid');
     grid.innerHTML = '';
-    
     if (snapshot.docs.length === 0) {
       grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--ink-dim); padding:40px;">No tracks available at the moment.</div>';
       return;
     }
-
     snapshot.docs.forEach((doc) => {
       const t = { id: doc.id, ...doc.data() };
       const tile = document.createElement('div');
       tile.className = 'tile';
-      
       const likeCount = t.likes !== undefined ? t.likes : 0;
       const hasVoted = votedTracks.includes(t.id);
       const upvoteText = likeCount === 1 ? 'UPVOTE' : 'UPVOTES';
-
-      // --- BADGE LOGICA ---
       let badgeHtml = '';
-      if (likeCount >= 50) {
-        badgeHtml = `<div class="tier-badge tier-legend">💎 Legend</div>`;
-      } else if (likeCount >= 25) {
-        badgeHtml = `<div class="tier-badge tier-gold">🥇 Hit</div>`;
-      } else if (likeCount >= 10) {
-        badgeHtml = `<div class="tier-badge tier-silver">🥈 Rising</div>`;
-      }
-
+      if (likeCount >= 50) badgeHtml = `<div class="tier-badge tier-legend">💎 Legend</div>`;
+      else if (likeCount >= 25) badgeHtml = `<div class="tier-badge tier-gold">🥇 Hit</div>`;
+      else if (likeCount >= 10) badgeHtml = `<div class="tier-badge tier-silver">🥈 Rising</div>`;
       tile.innerHTML = `
         <div class="tile-showcase">
             ${badgeHtml}
@@ -343,26 +216,19 @@
                 <div class="tile-title" title="${escapeHtml(t.track)}">${escapeHtml(t.track || 'Untitled')}</div>
                 <div class="tile-artist" title="${escapeHtml(t.artist)}">by ${escapeHtml(t.artist || 'Unknown Artist')}</div>
             </div>
-            
             <div class="tile-actions">
-                <button 
-                  class="upvote-btn ${hasVoted ? 'voted' : ''}" 
-                  onclick="upvoteTrack('${t.id}', this)">
+                <button class="upvote-btn ${hasVoted ? 'voted' : ''}" onclick="upvoteTrack('${t.id}', this)">
                   ${hasVoted ? '✓ VOTED' : `🔥 ${likeCount} ${upvoteText}`}
                 </button>
                 ${t.topicUrl ? `<a href="${t.topicUrl}" target="_blank" class="chatsong-btn" title="Join the conversation and write a reply">Write Reply</a>` : ''}
             </div>
         </div>
-        <div class="embed-container">
-            ${getEmbedHtml(t.trackUrl)}
-        </div>
+        <div class="embed-container">${getEmbedHtml(t.trackUrl)}</div>
       `;
-      
       grid.appendChild(tile);
     });
   });
 
-  // Modal Submission handler
   const submitBg = document.getElementById('submitBg');
   document.getElementById('openSubmit').addEventListener('click', () => submitBg.classList.add('open'));
   document.getElementById('submitClose').addEventListener('click', () => closeSubmit());
@@ -382,34 +248,20 @@
     const trackUrl = document.getElementById('fTrackUrl').value.trim();
     const topicUrl = document.getElementById('fTopicUrl').value.trim();
     const errEl = document.getElementById('formError');
-
     if (!topicUrl.includes('chatsong.nl') || !topicUrl.includes('/d/')) {
-      errEl.textContent = "This doesn't look like a valid Chatsong topic link — post your music in a topic first.";
+      errEl.textContent = "This doesn't look like a valid Chatsong topic link.";
       errEl.style.display = 'block';
       return;
     }
-    errEl.style.display = 'none';
-
     try {
-      await addDoc(collection(db, 'submissions'), {
-        artist,
-        trackUrl,
-        topicUrl,
-        createdAt: serverTimestamp()
-      });
+      await addDoc(collection(db, 'submissions'), { artist, trackUrl, topicUrl, createdAt: serverTimestamp() });
       document.getElementById('submitForm').style.display = 'none';
       document.getElementById('formSuccess').style.display = 'block';
       setTimeout(closeSubmit, 2200);
-    } catch (err) {
-      console.error('Submission failed:', err);
-      errEl.textContent = "Something went wrong sending your submission — please try again in a moment.";
-      errEl.style.display = 'block';
-    }
+    } catch (err) { errEl.textContent = "Submission failed."; errEl.style.display = 'block'; }
   });
 
-  function escapeHtml(str){
-    return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
+  function escapeHtml(str){ return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 </script>
 </body>
 </html>
