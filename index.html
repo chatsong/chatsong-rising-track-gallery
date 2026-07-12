@@ -1,152 +1,130 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chatsong — Rising Tracks Gallery</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root{ --bg: #0d0714; --bg-panel: #160c22; --purple: #9b59b6; --purple-glow: #b877d4; --magenta: #ff2e88; --amber: #ffb84d; --ink: #f2eafc; --ink-dim: #9a89ac; --line: rgba(155,89,182,0.25); }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{ background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(155,89,182,0.18), transparent), var(--bg); color:var(--ink); font-family:'Space Grotesk', sans-serif; min-height:100vh; padding:48px 20px 80px; }
-  .wrap{ max-width:1080px; margin:0 auto; }
-  header{ margin-bottom:44px; }
-  h1{ font-size:clamp(28px,5vw,42px); font-weight:700; letter-spacing:-0.02em; line-height:1.05; margin-bottom:10px; }
-  h1 span{ color:var(--purple-glow); }
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:18px; }
-  .tile{ position:relative; background:var(--bg-panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; cursor:pointer; transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
-  .tile:hover{ border-color:var(--purple); box-shadow:0 0 0 1px var(--purple), 0 12px 28px -12px rgba(155,89,182,0.5); }
-  
-  /* NIEUW: Embed wrapper in plaats van de oude .art class */
-  .embed-wrapper{ width:100%; aspect-ratio:1/1; background-color:var(--purple); pointer-events:none; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:34px; }
-  .embed-wrapper iframe{ width:100%; height:100%; border:none; }
-  
-  .meta{ padding:12px 14px 14px; }
-  .track{ font-size:14.5px; font-weight:700; line-height:1.25; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .artist{ font-size:12.5px; color:var(--ink-dim); margin-bottom:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .like-btn{ display:flex; align-items:center; gap:6px; background:transparent; border:1px solid var(--line); color:var(--ink); font-family:'JetBrains Mono', monospace; font-size:12px; padding:6px 10px; border-radius:20px; cursor:pointer; }
-  .modal-bg{ display:none; position:fixed; inset:0; background:rgba(8,4,13,0.85); backdrop-filter:blur(6px); align-items:center; justify-content:center; z-index:50; padding:20px; }
-  .modal-bg.open{ display:flex; }
-  .modal{ background:var(--bg-panel); border:1px solid var(--purple); border-radius:14px; max-width:420px; width:100%; padding:24px; position:relative; }
-  .modal-close{ position:absolute; top:14px; right:14px; background:none; border:none; color:var(--ink-dim); font-size:20px; cursor:pointer; }
-  .embed-container{ width:100%; min-height:200px; border-radius:8px; overflow:hidden; margin-top:20px; }
-  .submit-bar{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:28px; padding:16px 18px; background:var(--bg-panel); border:1px solid var(--line); border-radius:10px; }
-  .btn-primary{ background:var(--purple); color:#fff; border:none; padding:11px 18px; border-radius:8px; cursor:pointer; font-weight:700; }
-  .field{ margin-bottom:14px; }
-  .field label { display:block; margin-bottom:6px; font-size:14px; color:var(--ink-dim); }
-  .field input{ width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--line); color:var(--ink); padding:10px 12px; border-radius:7px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatsong — Rising Tracks Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0d0714; --bg-panel: #160c22; --purple: #9b59b6; --purple-glow: #b877d4; --ink: #f2eafc; --ink-dim: #9a89ac; --line: rgba(155,89,182,0.25); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(155,89,182,0.18), transparent), var(--bg); color: var(--ink); font-family: 'Space Grotesk', sans-serif; min-height: 100vh; padding: 48px 20px 80px; }
+        .wrap { max-width: 1080px; margin: 0 auto; }
+        header { margin-bottom: 44px; }
+        h1 { font-size: clamp(28px, 5vw, 42px); font-weight: 700; margin-bottom: 10px; }
+        h1 span { color: var(--purple-glow); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+        .tile { position: relative; background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; cursor: pointer; transition: 0.2s; }
+        .tile:hover { border-color: var(--purple); box-shadow: 0 0 10px rgba(155,89,182,0.3); }
+        .embed-wrapper { width: 100%; aspect-ratio: 1/1; background-color: var(--bg); pointer-events: none; overflow: hidden; }
+        .embed-wrapper iframe { width: 100%; height: 100%; border: none; }
+        .meta { padding: 12px 14px 14px; }
+        .track { font-size: 14.5px; font-weight: 700; margin-bottom: 2px; }
+        .artist { font-size: 12.5px; color: var(--ink-dim); margin-bottom: 10px; }
+        .like-btn { background: transparent; border: 1px solid var(--line); color: var(--ink); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 6px 10px; border-radius: 20px; cursor: pointer; }
+        .modal-bg { display: none; position: fixed; inset: 0; background: rgba(8,4,13,0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; z-index: 50; padding: 20px; }
+        .modal-bg.open { display: flex; }
+        .modal { background: var(--bg-panel); border: 1px solid var(--purple); border-radius: 14px; max-width: 420px; width: 100%; padding: 24px; position: relative; }
+        .modal-close { position: absolute; top: 14px; right: 14px; background: none; border: none; color: var(--ink-dim); font-size: 20px; cursor: pointer; }
+        .embed-container { width: 100%; height: 300px; border-radius: 8px; overflow: hidden; margin-top: 20px; }
+        .submit-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; padding: 16px 18px; background: var(--bg-panel); border: 1px solid var(--line); border-radius: 10px; }
+        .btn-primary { background: var(--purple); color: #fff; border: none; padding: 11px 18px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+        .field { margin-bottom: 14px; }
+        .field label { display: block; margin-bottom: 6px; font-size: 14px; color: var(--ink-dim); }
+        .field input { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--line); color: var(--ink); padding: 10px 12px; border-radius: 7px; }
+    </style>
 </head>
 <body>
-<div class="wrap">
-  <header><h1>Rising Tracks <span>Gallery</span></h1></header>
-  <div class="submit-bar">
-    <p>Submit your track.</p>
-    <button class="btn-primary" id="openSubmit">+ Submit</button>
-  </div>
-  <div class="grid" id="grid"></div>
-</div>
+    <div class="wrap">
+        <header><h1>Rising Tracks <span>Gallery</span></h1></header>
+        <div class="submit-bar">
+            <p>Submit your track.</p>
+            <button class="btn-primary" id="openSubmit">+ Submit</button>
+        </div>
+        <div class="grid" id="grid"></div>
+    </div>
 
-<!-- Modal voor de speler -->
-<div class="modal-bg" id="modalBg">
-  <div class="modal">
-    <button class="modal-close" id="modalClose">✕</button>
-    <h2 id="modalTrack" style="font-size:20px; margin-bottom:15px;"></h2>
-    <div id="modalEmbed" class="embed-container"></div>
-  </div>
-</div>
+    <div class="modal-bg" id="modalBg">
+        <div class="modal">
+            <button class="modal-close" id="modalClose">✕</button>
+            <h2 id="modalTrack" style="font-size:20px;"></h2>
+            <div id="modalEmbed" class="embed-container"></div>
+        </div>
+    </div>
 
-<!-- Modal voor Submit Formulier -->
-<div class="modal-bg" id="submitBg">
-  <div class="modal">
-    <button class="modal-close" id="submitClose">✕</button>
-    <h2 style="margin-bottom:20px;">Submit Track</h2>
-    <form id="submitForm">
-      <div class="field"><label>Artiest</label><input type="text" id="fArtist" required></div>
-      <div class="field"><label>Track Naam</label><input type="text" id="fTrackName" required></div>
-      <div class="field"><label>Track URL (Spotify/SoundCloud/YT)</label><input type="url" id="fTrackUrl" required></div>
-      <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">Toevoegen</button>
-    </form>
-  </div>
-</div>
+    <div class="modal-bg" id="submitBg">
+        <div class="modal">
+            <button class="modal-close" id="submitClose">✕</button>
+            <h2>Submit Track</h2>
+            <form id="submitForm" style="margin-top:20px;">
+                <div class="field"><label>Artiest</label><input type="text" id="fArtist" required></div>
+                <div class="field"><label>Track Naam</label><input type="text" id="fTrackName" required></div>
+                <div class="field"><label>Track URL</label><input type="url" id="fTrackUrl" required></div>
+                <button type="submit" class="btn-primary" style="width:100%;">Toevoegen</button>
+            </form>
+        </div>
+    </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  // addDoc is toegevoegd om tracks op te kunnen slaan
-  import { getFirestore, collection, onSnapshot, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-  const db = getFirestore(initializeApp({ apiKey: "AIzaSyCO7DtGmr80FVgiUt3DUCl-PLF58MNk160", authDomain: "chatsong-track-gallery.firebaseapp.com", projectId: "chatsong-track-gallery", storageBucket: "chatsong-track-gallery.firebasestorage.app", messagingSenderId: "800320909638", appId: "1:800320909638:web:36cb0f043699c5ef767547" }));
+        const db = getFirestore(initializeApp({ apiKey: "AIzaSyCO7DtGmr80FVgiUt3DUCl-PLF58MNk160", authDomain: "chatsong-track-gallery.firebaseapp.com", projectId: "chatsong-track-gallery", storageBucket: "chatsong-track-gallery.firebasestorage.app", messagingSenderId: "800320909638", appId: "1:800320909638:web:36cb0f043699c5ef767547" }));
 
-  // Universele functie voor ALLE platformen via Iframely
-  async function getTrackMetadata(url) {
-    try {
-        const res = await fetch(`https://iframe.ly/api/oembed?url=${encodeURIComponent(url)}&api_key=e8b7d60a5d5c0746401083`);
-        return await res.json();
-    } catch (e) { return { html: '🎵' }; } // Fallback nootje als het mislukt
-  }
+        function getEmbedHtml(url) {
+            if (url.includes('spotify.com')) {
+                const id = url.split('/').pop().split('?')[0];
+                return `<iframe src="https://open.spotify.com/embed/track/${id}" width="100%" height="100%"></iframe>`;
+            }
+            if (url.includes('soundcloud.com')) {
+                return `<iframe src="https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}" width="100%" height="100%"></iframe>`;
+            }
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                const id = url.includes('youtu.be') ? url.split('/').pop() : url.split('v=')[1].split('&')[0];
+                return `<iframe src="https://www.youtube.com/embed/${id}" width="100%" height="100%"></iframe>`;
+            }
+            return '<div style="padding:20px; text-align:center;">Geen preview</div>';
+        }
 
-  // Luister naar de database en render de tracks
-  onSnapshot(query(collection(db, 'tracks'), orderBy('likes', 'desc')), async (snap) => {
-    const grid = document.getElementById('grid');
-    grid.innerHTML = '';
-    
-    for (const doc of snap.docs) {
-      const t = { id: doc.id, ...doc.data() };
-      const meta = await getTrackMetadata(t.trackUrl);
-      
-      const tile = document.createElement('div');
-      tile.className = 'tile';
-      
-      // Injecteer de iframe in plaats van de losse cover art
-      tile.innerHTML = `
-        <div class="embed-wrapper">${meta.html || '🎵'}</div>
-        <div class="meta">
-          <div class="track">${t.track || 'Unknown Track'}</div>
-          <div class="artist">${t.artist || 'Unknown Artist'}</div>
-          <button class="like-btn">♥ ${t.likes || 0}</button>
-        </div>`;
-        
-      tile.onclick = () => {
-        document.getElementById('modalTrack').textContent = t.track;
-        document.getElementById('modalEmbed').innerHTML = meta.html;
-        document.getElementById('modalBg').classList.add('open');
-      };
-      
-      grid.appendChild(tile);
-    }
-  });
+        onSnapshot(query(collection(db, 'tracks'), orderBy('likes', 'desc')), (snap) => {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            snap.forEach((doc) => {
+                const t = { id: doc.id, ...doc.data() };
+                const html = getEmbedHtml(t.trackUrl);
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.innerHTML = `
+                    <div class="embed-wrapper">${html}</div>
+                    <div class="meta">
+                        <div class="track">${t.track}</div>
+                        <div class="artist">${t.artist}</div>
+                        <button class="like-btn">♥ ${t.likes || 0}</button>
+                    </div>`;
+                tile.onclick = () => {
+                    document.getElementById('modalTrack').textContent = t.track;
+                    document.getElementById('modalEmbed').innerHTML = html;
+                    document.getElementById('modalBg').classList.add('open');
+                };
+                grid.appendChild(tile);
+            });
+        });
 
-  // Functie voor het verzenden van een nieuwe track naar Firebase
-  document.getElementById('submitForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); // Voorkom dat de pagina herlaadt
-    
-    const artist = document.getElementById('fArtist').value;
-    const track = document.getElementById('fTrackName').value;
-    const trackUrl = document.getElementById('fTrackUrl').value;
+        document.getElementById('submitForm').onsubmit = async (e) => {
+            e.preventDefault();
+            await addDoc(collection(db, 'tracks'), {
+                artist: document.getElementById('fArtist').value,
+                track: document.getElementById('fTrackName').value,
+                trackUrl: document.getElementById('fTrackUrl').value,
+                likes: 0
+            });
+            document.getElementById('submitBg').classList.remove('open');
+            document.getElementById('submitForm').reset();
+        };
 
-    try {
-      await addDoc(collection(db, 'tracks'), {
-        artist: artist,
-        track: track,
-        trackUrl: trackUrl,
-        likes: 0 // Start altijd met 0 likes
-      });
-      
-      // Sluit modal en reset formulier
-      document.getElementById('submitBg').classList.remove('open');
-      document.getElementById('submitForm').reset();
-    } catch (error) {
-      console.error("Fout bij toevoegen track: ", error);
-      alert("Er is iets misgegaan bij het toevoegen.");
-    }
-  });
-
-  // Modal bediening
-  document.getElementById('modalClose').onclick = () => document.getElementById('modalBg').classList.remove('open');
-  document.getElementById('openSubmit').onclick = () => document.getElementById('submitBg').classList.add('open');
-  document.getElementById('submitClose').onclick = () => document.getElementById('submitBg').classList.remove('open');
-</script>
+        document.getElementById('modalClose').onclick = () => document.getElementById('modalBg').classList.remove('open');
+        document.getElementById('openSubmit').onclick = () => document.getElementById('submitBg').classList.add('open');
+        document.getElementById('submitClose').onclick = () => document.getElementById('submitBg').classList.remove('open');
+    </script>
 </body>
 </html>
