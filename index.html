@@ -211,6 +211,7 @@
   
   <footer>Live gallery, powered by chatsong Tracks appear here once reviewed and approved.</footer>
 </div>
+
 <!-- Submit Modal -->
 <div class="modal-bg" id="submitBg">
   <div class="modal">
@@ -231,6 +232,8 @@
         <input type="url" id="fTrackUrl" placeholder="Spotify / SoundCloud / Bandcamp / Apple Music link" required>
         <small>The music widget will automatically build from this URL.</small>
       </div>
+      
+      <!-- Hieronder staat het veld met de duidelijke uitleg -->
       <div class="field">
         <label for="fTopicUrl">Link to your forum topic</label>
         <input type="url" id="fTopicUrl" placeholder="https://community.chatsong.nl/d/..." required>
@@ -238,13 +241,12 @@
           <strong>How to get this link?</strong> <a href="https://community.chatsong.nl" target="_blank" style="color:var(--magenta); text-decoration:underline; font-weight:bold;">Open the forum here</a> and post your track. Once posted, simply copy the web address from the top of your browser and paste it here!
         </small>
       </div>
+
       <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">Submit for review</button>
       <div class="form-success" id="formSuccess">Thanks! Your track has been sent for approval.</div>
     </form>
   </div>
 </div>
-
-
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
   import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
