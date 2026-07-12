@@ -1,127 +1,161 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chatsong Gallery — Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>Chatsong — Rising Tracks Gallery</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg: #0d0714; --bg-panel: #160c22; --purple: #9b59b6; --purple-glow: #b877d4;
-    --magenta: #ff2e88; --amber: #ffb84d; --ink: #f2eafc; --ink-dim: #9a89ac; --line: rgba(155,89,182,0.25);
+  :root { 
+    --bg: #0d0714; --bg-panel: #160c22; --purple: #9b59b6; 
+    --purple-glow: #b877d4; --magenta: #ff2e88; --ink: #f2eafc; 
+    --ink-dim: #9a89ac; --line: rgba(155,89,182,0.25); 
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{ background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(155,89,182,0.18), transparent), var(--bg); color:var(--ink); font-family:'Space Grotesk', sans-serif; min-height:100vh; padding:48px 20px 80px; }
-  .wrap{ max-width:760px; margin:0 auto; }
-  header{ margin-bottom:32px; }
-  .eyebrow{ font-family:'JetBrains Mono', monospace; font-size:12px; letter-spacing:0.15em; text-transform:uppercase; color:var(--magenta); margin-bottom:12px; }
-  h1{ font-size:clamp(24px,5vw,34px); font-weight:700; }
+  .wrap{ max-width:1200px; margin:0 auto; }
+  header{ margin-bottom:44px; }
   h1 span{ color:var(--purple-glow); }
-  .signin-box{ background:var(--bg-panel); border:1px solid var(--line); border-radius:12px; padding:40px 32px; text-align:center; margin-top:60px; }
-  .google-btn{ display:inline-flex; align-items:center; gap:10px; background:#fff; color:#1f1f1f; border:none; font-weight:700; padding:12px 22px; border-radius:8px; cursor:pointer; }
-  .denied-box{ background:rgba(255,46,136,0.08); border:1px solid rgba(255,46,136,0.35); border-radius:10px; padding:20px; margin-top:24px; display:none; }
-  .user-bar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; padding:12px 16px; background:var(--bg-panel); border:1px solid var(--line); border-radius:10px; font-size:13px; color:var(--ink-dim); }
-  .signout{ background:none; border:1px solid var(--line); color:var(--ink-dim); padding:6px 12px; border-radius:6px; cursor:pointer; }
-  .sub-card{ background:var(--bg-panel); border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin-bottom:16px; }
-  .artist{ font-size:16px; font-weight:700; margin-bottom:4px; }
-  .meta-line{ font-family:'JetBrains Mono', monospace; font-size:11.5px; color:var(--ink-dim); margin-bottom:2px; }
-  .meta-line a{ color:var(--purple-glow); }
-  .approve-fields{ display:grid; grid-template-columns:2fr 1fr; gap:10px; margin:16px 0 14px; }
-  .approve-fields input, .approve-fields select{ width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--line); color:var(--ink); padding:9px 11px; border-radius:7px; outline:none; }
-  .card-actions{ display:flex; gap:10px; }
-  .btn-approve{ background:var(--purple); color:#fff; border:none; padding:10px 16px; border-radius:7px; cursor:pointer; }
-  .btn-reject{ background:transparent; border:1px solid var(--line); color:var(--ink-dim); padding:10px 16px; border-radius:7px; cursor:pointer; }
-  .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--amber); color:#1f1300; font-weight:700; padding:10px 18px; border-radius:8px; display:none; }
-  [hidden]{ display:none !important; }
-  .error-tag{ color: var(--magenta); font-size: 12px; font-weight: bold; }
+  
+  /* Grid ingericht op embedded spelers */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:24px; }
+  .tile{ background:var(--bg-panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; transition:border-color 0.2s; }
+  .tile:hover{ border-color:var(--purple); }
+  
+  .tile-info { padding:16px; border-bottom:1px solid rgba(155,89,182,0.15); display:flex; justify-content:between; align-items:center; gap:10px; }
+  .tile-text { flex-grow: 1; min-width: 0; }
+  .tile-title { font-weight:700; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tile-artist { font-size:12px; color:var(--ink-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  
+  .chatsong-btn { font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--purple-glow); text-decoration:none; padding:4px 8px; border:1px solid rgba(155,89,182,0.4); border-radius:4px; white-space:nowrap; }
+  .chatsong-btn:hover { background:rgba(155,89,182,0.1); border-color:var(--purple-glow); }
+
+  .embed-container { width:100%; min-height:120px; background:rgba(0,0,0,0.15); display:flex; align-items:center; justify-content:center; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="eyebrow">Chatsong · Rising Tracks Gallery</div>
-    <h1>Submission <span>Review</span></h1>
+    <h1>Rising Tracks <span>Gallery</span></h1>
   </header>
-  <div id="signinView">
-    <div class="signin-box">
-      <p>Sign in with the Google account tied to your Chatsong admin access.</p>
-      <button class="google-btn" id="googleSignIn">Sign in with Google</button>
-      <div class="denied-box" id="deniedBox">Admin access denied.</div>
-    </div>
-  </div>
-  <div id="adminView" hidden>
-    <div class="user-bar">
-      <span id="userEmail"></span>
-      <button class="signout" id="signOutBtn">Sign out</button>
-    </div>
-    <div id="subsList"></div>
-  </div>
+  <div class="grid" id="grid"></div>
 </div>
-<div class="toast" id="toast"></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-  import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-  const app = initializeApp({ apiKey: "AIzaSyCO7DtGmr80FVgiUt3DUCl-PLF58MNk160", authDomain: "chatsong-track-gallery.firebaseapp.com", projectId: "chatsong-track-gallery", storageBucket: "chatsong-track-gallery.firebasestorage.app", messagingSenderId: "800320909638", appId: "1:800320909638:web:36cb0f043699c5ef767547" });
-  const auth = getAuth(app); const db = getFirestore(app); const provider = new GoogleAuthProvider();
+  const app = initializeApp({
+    apiKey: "AIzaSyCO7DtGmr80FVgiUt3DUCl-PLF58MNk160",
+    authDomain: "chatsong-track-gallery.firebaseapp.com",
+    projectId: "chatsong-track-gallery",
+    storageBucket: "chatsong-track-gallery.firebasestorage.app",
+    messagingSenderId: "800320909638",
+    appId: "1:800320909638:web:36cb0f043699c5ef767547"
+  });
+  const db = getFirestore(app);
 
-  document.getElementById('googleSignIn').onclick = () => signInWithPopup(auth, provider);
-  document.getElementById('signOutBtn').onclick = () => signOut(auth);
+  // Synchronisatie van de standaard platforms (Spotify, SoundCloud, YouTube, Mixcloud)
+  function getEmbedHtml(url, containerId) {
+    if (!url) return '<div style="padding:20px; color:var(--ink-dim);">Geen link beschikbaar</div>';
+    
+    // 1. Spotify
+    if (url.includes('spotify.com')) {
+        const cleanUrl = url.split('?')[0].replace('spotify.com/', 'spotify.com/embed/');
+        return `<iframe src="${cleanUrl}" width="100%" height="152" frameborder="0" allow="encrypted-media" style="border:0; display:block;"></iframe>`;
+    }
+    
+    // 2. SoundCloud
+    if (url.includes('soundcloud.com')) {
+        return `<iframe width="100%" height="152" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%239b59b6&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false" style="border:0; display:block;"></iframe>`;
+    }
+    
+    // 3. YouTube
+    if (url.includes('youtu')) {
+        let id = '';
+        if (url.includes('v=')) {
+            id = url.split('v=')[1].split('&')[0];
+        } else {
+            id = url.split('/').pop().split('?')[0];
+        }
+        return `<iframe width="100%" height="180" src="https://www.youtube.com/embed/${id}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border:0; display:block;"></iframe>`;
+    }
 
-  onAuthStateChanged(auth, (user) => {
-    if (!user) { signinView.hidden = false; adminView.hidden = true; return; }
-    document.getElementById('userEmail').textContent = user.email;
-    onSnapshot(query(collection(db, 'submissions'), orderBy('createdAt', 'desc')), (snap) => {
-      signinView.hidden = true; adminView.hidden = false;
-      renderSubs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    // 4. Mixcloud
+    if (url.includes('mixcloud.com')) {
+        const path = url.split('mixcloud.com')[1].split('?')[0];
+        return `<iframe width="100%" height="120" src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=0&feed=${encodeURIComponent(path)}" frameborder="0" style="border:0; display:block;"></iframe>`;
+    }
+
+    // 5. Bandcamp (Maakt gebruik van asynchrone oEmbed afhandeling hieronder)
+    if (url.includes('bandcamp.com')) {
+        fetchBandcampEmbed(url, containerId);
+        return `<div style="padding:20px; color:var(--ink-dim); font-size:13px;">Speler laden...</div>`;
+    }
+    
+    return `<div style="padding:24px; text-align:center;"><a href="${url}" target="_blank" style="color:var(--purple-glow); font-size:14px;">Beluister op externe website ↗</a></div>`;
+  }
+
+  // Speciale functie om Bandcamp embeds dynamisch op te halen via hun oEmbed endpoint
+  async function fetchBandcampEmbed(url, containerId) {
+    try {
+      const response = await fetch(`https://bandcamp.com/developer/oembed?url=${encodeURIComponent(url)}&format=json`);
+      if (!response.ok) throw new Error();
+      const data = await response.json();
+      
+      const container = document.getElementById(containerId);
+      if (container && data.html) {
+        // Pas de styling aan zodat de iframe van Bandcamp mooi binnen onze styling past
+        let embedCode = data.html
+          .replace('width="400"', 'width="100%"')
+          .replace('height="400"', 'height="152"')
+          .replace('height: 400px;', 'height: 152px;');
+        container.innerHTML = embedCode;
+      }
+    } catch (e) {
+      const container = document.getElementById(containerId);
+      if (container) {
+        container.innerHTML = `<div style="padding:24px; text-align:center;"><a href="${url}" target="_blank" style="color:var(--purple-glow); font-size:14px;">Beluister op Bandcamp ↗</a></div>`;
+      }
+    }
+  }
+
+  // Live tracks ophalen uit Firestore en direct in de grid laden
+  onSnapshot(query(collection(db, 'tracks'), orderBy('likes', 'desc')), (snapshot) => {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    
+    if (snapshot.docs.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:var(--ink-dim); padding:40px;">Er zijn nog geen goedgekeurde tracks om te tonen.</div>';
+      return;
+    }
+
+    snapshot.docs.forEach((doc, index) => {
+      const t = { id: doc.id, ...doc.data() };
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      const containerId = `embed-${index}`;
+      
+      tile.innerHTML = `
+        <div class="tile-info">
+            <div class="tile-text">
+                <div class="tile-title" title="${escapeHtml(t.track)}">${escapeHtml(t.track)}</div>
+                <div class="tile-artist" title="${escapeHtml(t.artist)}">${escapeHtml(t.artist || 'Onbekend')}</div>
+            </div>
+            ${t.topicUrl ? `<a href="${t.topicUrl}" target="_blank" class="chatsong-btn">Chat ↗</a>` : ''}
+        </div>
+        <div class="embed-container" id="${containerId}">
+            ${getEmbedHtml(t.trackUrl, containerId)}
+        </div>
+      `;
+      
+      grid.appendChild(tile);
     });
   });
 
-  function renderSubs(subs){
-    subsList.innerHTML = subs.length === 0 ? '<div class="empty-state">Nothing pending.</div>' : '';
-    subs.forEach(s => {
-      const hasTopic = s.topicUrl && s.topicUrl.trim() !== "";
-      const card = document.createElement('div');
-      card.className = 'sub-card';
-      card.innerHTML = `
-        <div class="artist">${escapeHtml(s.artist || 'Unknown')}</div>
-        <div class="meta-line">track: <a href="${s.trackUrl}" target="_blank">${s.trackUrl}</a></div>
-        <div class="meta-line">topic: ${hasTopic ? `<a href="${s.topicUrl}" target="_blank">${s.topicUrl}</a>` : '<span class="error-tag">MISSING CHATSONG LINK</span>'}</div>
-        ${hasTopic ? `
-          <div class="approve-fields">
-            <input type="text" placeholder="Track title" class="f-title">
-            <select class="f-platform"><option>Spotify</option><option>SoundCloud</option><option>YouTube</option></select>
-          </div>
-          <div class="card-actions">
-            <button class="btn-approve">✓ Approve</button>
-            <button class="btn-reject">✕ Reject</button>
-          </div>` : `<div class="card-actions"><button class="btn-reject" style="width:100%">Delete Invalid Submission</button></div>`}
-      `;
-      
-      if(hasTopic) {
-        card.querySelector('.btn-approve').onclick = async (e) => {
-          const title = card.querySelector('.f-title').value.trim();
-          if(!title) return;
-          e.target.disabled = true;
-          await addDoc(collection(db, 'tracks'), { artist: s.artist, track: title, trackUrl: s.trackUrl, topicUrl: s.topicUrl, platform: card.querySelector('.f-platform').value, likes: 0 });
-          await deleteDoc(doc(db, 'submissions', s.id));
-          showToast('Approved!');
-        };
-      }
-      card.querySelector('.btn-reject').onclick = async () => {
-        await deleteDoc(doc(db, 'submissions', s.id));
-        showToast('Rejected.');
-      };
-      subsList.appendChild(card);
-    });
+  function escapeHtml(str){
+    return String(str || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
-
-  function showToast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000); }
-  function escapeHtml(str){ return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 </script>
 </body>
 </html>
