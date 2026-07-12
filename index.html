@@ -211,13 +211,15 @@
   
   <footer>Live gallery, powered by chatsong Tracks appear here once reviewed and approved.</footer>
 </div>
-
 <!-- Submit Modal -->
 <div class="modal-bg" id="submitBg">
   <div class="modal">
     <button class="modal-close" id="submitClose">✕</button>
     <h2>Submit a track</h2>
-    <p style="color:var(--ink-dim); font-size:13px; margin-bottom:18px;">Required: your music must already be posted in a forum topic.</p>
+    <p style="color:var(--ink-dim); font-size:13px; margin-bottom:18px; line-height:1.5;">
+      <strong>Step 1:</strong> Create a new post about your music on the forum.<br>
+      <strong>Step 2:</strong> Paste the link to your new post below.
+    </p>
     <div class="form-error" id="formError"></div>
     <form id="submitForm">
       <div class="field">
@@ -231,14 +233,17 @@
       </div>
       <div class="field">
         <label for="fTopicUrl">Link to your forum topic</label>
-        <input type="url" id="fTopicUrl" placeholder="community.chatsong.nl/d/..." required>
-        <small>Without a topic link, your submission won't be reviewed.</small>
+        <input type="url" id="fTopicUrl" placeholder="https://community.chatsong.nl/d/..." required>
+        <small style="line-height:1.5; padding-top:4px;">
+          <strong>How to get this link?</strong> <a href="https://community.chatsong.nl" target="_blank" style="color:var(--magenta); text-decoration:underline; font-weight:bold;">Open the forum here</a> and post your track. Once posted, simply copy the web address from the top of your browser and paste it here!
+        </small>
       </div>
-      <button type="submit" class="btn-primary" style="width:100%;">Submit for review</button>
+      <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">Submit for review</button>
       <div class="form-success" id="formSuccess">Thanks! Your track has been sent for approval.</div>
     </form>
   </div>
 </div>
+
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
