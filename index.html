@@ -4,89 +4,340 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chatsong — Rising Tracks Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root{ --bg: #0d0714; --bg-panel: #160c22; --purple: #9b59b6; --purple-glow: #b877d4; --magenta: #ff2e88; --amber: #ffb84d; --ink: #f2eafc; --ink-dim: #9a89ac; --line: rgba(155,89,182,0.25); }
+  :root{
+    --bg: #0d0714;
+    --bg-panel: #160c22;
+    --purple: #9b59b6;
+    --purple-glow: #b877d4;
+    --magenta: #ff2e88;
+    --amber: #ffb84d;
+    --ink: #f2eafc;
+    --ink-dim: #9a89ac;
+    --line: rgba(155,89,182,0.25);
+  }
   *{box-sizing:border-box; margin:0; padding:0;}
-  body{ background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(155,89,182,0.18), transparent), var(--bg); color:var(--ink); font-family:'Space Grotesk', sans-serif; min-height:100vh; padding:48px 20px 80px; }
+  body{
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(155,89,182,0.18), transparent),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    min-height:100vh;
+    padding:48px 20px 80px;
+  }
   .wrap{ max-width:1080px; margin:0 auto; }
+
   header{ margin-bottom:44px; }
-  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:18px; }
-  .tile{ position:relative; background:var(--bg-panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; cursor:pointer; }
-  .modal-bg{ display:none; position:fixed; inset:0; background:rgba(8,4,13,0.85); backdrop-filter:blur(6px); align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color:var(--magenta);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:'';
+    width:6px; height:6px; border-radius:50%;
+    background:var(--magenta);
+    box-shadow:0 0 8px var(--magenta);
+    animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  h1{
+    font-size:clamp(28px,5vw,42px);
+    font-weight:700;
+    letter-spacing:-0.02em;
+    line-height:1.05;
+    margin-bottom:10px;
+  }
+  h1 span{ color:var(--purple-glow); }
+  header p{ color:var(--ink-dim); font-size:15px; max-width:520px; line-height:1.5; }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px,1fr));
+    gap:18px;
+  }
+
+  .tile{
+    position:relative;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    cursor:pointer;
+    transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .tile:hover{
+    border-color:var(--purple);
+    box-shadow:0 0 0 1px var(--purple), 0 12px 28px -12px rgba(155,89,182,0.5);
+  }
+  .tile.rising{
+    animation: riseGlow 0.7s ease;
+  }
+  @keyframes riseGlow{
+    0%{ box-shadow:0 0 0 1px var(--magenta), 0 0 24px rgba(255,46,136,0.55); }
+    100%{ box-shadow:0 0 0 1px transparent, 0 0 0 rgba(255,46,136,0); }
+  }
+
+  .rank{
+    position:absolute; top:10px; left:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    background:rgba(13,7,20,0.75);
+    backdrop-filter:blur(4px);
+    color:var(--ink-dim);
+    padding:3px 7px;
+    border-radius:5px;
+    letter-spacing:0.05em;
+    z-index:2;
+  }
+  .rank.top{ color:var(--amber); border:1px solid rgba(255,184,77,0.4); }
+
+  .art{
+    width:100%; aspect-ratio:1/1;
+    background:linear-gradient(135deg, var(--purple), #4a2a63);
+    display:flex; align-items:center; justify-content:center;
+    font-size:34px;
+    position:relative;
+  }
+
+  .meta{ padding:12px 14px 14px; }
+  .track{ font-size:14.5px; font-weight:700; line-height:1.25; margin-bottom:2px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .artist{ font-size:12.5px; color:var(--ink-dim); margin-bottom:10px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .like-btn{
+    display:flex; align-items:center; gap:6px;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:6px 10px;
+    border-radius:20px;
+    cursor:pointer;
+    transition: all 0.15s ease;
+  }
+  .like-btn:hover{ border-color:var(--magenta); color:var(--magenta); }
+  .like-btn.liked{ background:var(--magenta); border-color:var(--magenta); color:#fff; }
+  .like-btn .count{ font-weight:700; }
+
+  .platform-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    color:var(--ink-dim);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+
+  /* Modal */
+  .modal-bg{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(8,4,13,0.85);
+    backdrop-filter:blur(6px);
+    align-items:center; justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
   .modal-bg.open{ display:flex; }
-  .modal{ background:var(--bg-panel); border:1px solid var(--purple); border-radius:14px; max-width:420px; width:100%; padding:24px; position:relative; }
-  .modal-close{ position:absolute; top:14px; right:14px; background:none; border:none; color:white; cursor:pointer; font-size:20px; }
-  /* Embed styling */
-  .embed-container { width:100%; margin-top:20px; border-radius:8px; overflow:hidden; }
+  .modal{
+    background:var(--bg-panel);
+    border:1px solid var(--purple);
+    border-radius:14px;
+    max-width:420px; width:100%;
+    padding:24px;
+    position:relative;
+  }
+  .modal-close{
+    position:absolute; top:14px; right:14px;
+    background:none; border:none; color:var(--ink-dim);
+    font-size:20px; cursor:pointer; line-height:1;
+  }
+  .modal-close:hover{ color:var(--ink); }
+  .modal h2{ font-size:18px; margin-bottom:4px; padding-right:24px; }
+  .modal .artist{ margin-bottom:16px; }
+  .embed-container{
+    width:100%; min-height:152px;
+    border-radius:8px;
+    overflow:hidden;
+    margin-top:20px;
+  }
+
+  /* Submit CTA + form */
+  .submit-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; flex-wrap:wrap;
+    margin-bottom:28px;
+    padding:16px 18px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  .submit-bar p{ font-size:13px; color:var(--ink-dim); max-width:460px; line-height:1.5; }
+  .submit-bar strong{ color:var(--ink); }
+  .btn-primary{
+    background:var(--purple);
+    color:#fff;
+    border:none;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    font-size:13.5px;
+    padding:11px 18px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .btn-primary:hover{ background:var(--purple-glow); }
+
+  .field{ margin-bottom:14px; }
+  .field label{
+    display:block; font-family:'JetBrains Mono', monospace; font-size:11px;
+    color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;
+  }
+  .field input{
+    width:100%;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--line);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    font-size:14px;
+    padding:10px 12px;
+    border-radius:7px;
+    outline:none;
+  }
+  .form-error{ color:var(--magenta); font-size:12px; font-family:'JetBrains Mono', monospace; margin-bottom:10px; display:none; }
+  .form-success{
+    display:none;
+    font-size:13px; color:var(--amber);
+    background:rgba(255,184,77,0.08);
+    border:1px solid rgba(255,184,77,0.3);
+    padding:10px 12px; border-radius:8px; margin-top:4px;
+  }
+  footer{ margin-top:40px; text-align:center; color:var(--ink-dim); font-size:11.5px;
+    font-family:'JetBrains Mono', monospace; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
+    <div class="eyebrow">Live · Community Powered</div>
     <h1>Rising Tracks <span>Gallery</span></h1>
+    <p>Click a tile to hear the track. Like it, and it climbs — no algorithm, just what the community loves.</p>
   </header>
+
+  <div class="submit-bar">
+    <p>Got a <strong>topic with your music</strong> on the forum? Submit your track to the gallery — once approved, your tile goes live.</p>
+    <button class="btn-primary" id="openSubmit">+ Submit a track</button>
+  </div>
+
   <div class="grid" id="grid"></div>
+
+  <footer>Live gallery, powered by Firebase. Tracks appear here once reviewed and approved.</footer>
 </div>
 
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <button class="modal-close" id="modalClose">✕</button>
     <h2 id="modalTrack"></h2>
+    <div class="artist" id="modalArtist"></div>
     <div id="modalEmbed" class="embed-container"></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="submitBg">
+  <div class="modal">
+    <button class="modal-close" id="submitClose">✕</button>
+    <h2>Submit a track</h2>
+    <div class="form-error" id="formError"></div>
+    <form id="submitForm">
+      <div class="field">
+        <label for="fArtist">Artist name</label>
+        <input type="text" id="fArtist" required>
+      </div>
+      <div class="field">
+        <label for="fTrackUrl">Track URL</label>
+        <input type="url" id="fTrackUrl" required>
+      </div>
+      <div class="field">
+        <label for="fTopicUrl">Link to your forum topic</label>
+        <input type="url" id="fTopicUrl" required>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;">Submit for review</button>
+      <div class="form-success" id="formSuccess">Thanks! Your track is under review.</div>
+    </form>
   </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-  const app = initializeApp({
+  const db = getFirestore(initializeApp({
     apiKey: "AIzaSyCO7DtGmr80FVgiUt3DUCl-PLF58MNk160",
     authDomain: "chatsong-track-gallery.firebaseapp.com",
     projectId: "chatsong-track-gallery",
     storageBucket: "chatsong-track-gallery.firebasestorage.app",
     messagingSenderId: "800320909638",
     appId: "1:800320909638:web:36cb0f043699c5ef767547"
-  });
-  const db = getFirestore(app);
+  }));
 
-  // Logica om de juiste embed te genereren
-  function getEmbedHtml(url) {
-    if (!url) return '';
-    if (url.includes('spotify.com/track/')) {
+  // Embed logica voor het modal
+  function getEmbedHtml(url, platform) {
+    if (platform === 'Spotify' && url.includes('track/')) {
         const id = url.split('/track/')[1].split('?')[0];
-        return `<iframe src="https://open.spotify.com/embed/track/${id}" width="100%" height="152" frameborder="0" allow="encrypted-media"></iframe>`;
+        return `<iframe src="https://open.spotify.com/embed/track/${id}" width="100%" height="152" frameborder="0"></iframe>`;
     }
-    if (url.includes('soundcloud.com')) {
+    if (platform === 'SoundCloud') {
         return `<iframe width="100%" height="160" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}"></iframe>`;
     }
-    if (url.includes('youtu')) {
-        const id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop();
-        return `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`;
-    }
-    return `<a href="${url}" target="_blank" style="color:var(--purple-glow)">Open track in browser</a>`;
+    return `<a href="${url}" target="_blank" style="color:var(--purple-glow); display:block; padding:20px; text-align:center;">Open on ${platform}</a>`;
   }
 
-  // Grid laden
-  onSnapshot(query(collection(db, 'tracks'), orderBy('likes', 'desc')), (snapshot) => {
-    const grid = document.getElementById('grid');
+  const grid = document.getElementById('grid');
+  onSnapshot(query(collection(db, 'tracks'), orderBy('likes', 'desc')), (snap) => {
     grid.innerHTML = '';
-    snapshot.docs.forEach(doc => {
+    snap.docs.forEach((doc, i) => {
       const t = { id: doc.id, ...doc.data() };
       const tile = document.createElement('div');
       tile.className = 'tile';
-      tile.innerHTML = `<div style="padding:20px;"><h3>${t.track}</h3><p>${t.artist}</p></div>`;
-      tile.onclick = () => {
-        document.getElementById('modalTrack').textContent = t.track;
-        document.getElementById('modalEmbed').innerHTML = getEmbedHtml(t.trackUrl);
-        document.getElementById('modalBg').classList.add('open');
-      };
+      tile.innerHTML = `<div class="rank">#${i+1}</div><div class="art">🎵</div><div class="meta"><div class="track">${t.track}</div><div class="artist">${t.artist}</div><div class="row"><span class="platform-tag">${t.platform}</span><button class="like-btn">♥ <span class="count">${t.likes}</span></button></div></div>`;
+      tile.onclick = (e) => { if(!e.target.closest('.like-btn')) openModal(t); };
       grid.appendChild(tile);
     });
   });
 
+  function openModal(t) {
+    document.getElementById('modalTrack').textContent = t.track;
+    document.getElementById('modalArtist').textContent = t.artist;
+    document.getElementById('modalEmbed').innerHTML = getEmbedHtml(t.trackUrl, t.platform);
+    document.getElementById('modalBg').classList.add('open');
+  }
+
   document.getElementById('modalClose').onclick = () => document.getElementById('modalBg').classList.remove('open');
+  document.getElementById('openSubmit').onclick = () => document.getElementById('submitBg').classList.add('open');
+  document.getElementById('submitClose').onclick = () => document.getElementById('submitBg').classList.remove('open');
+
+  document.getElementById('submitForm').onsubmit = async (e) => {
+    e.preventDefault();
+    await addDoc(collection(db, 'submissions'), {
+      artist: document.getElementById('fArtist').value,
+      trackUrl: document.getElementById('fTrackUrl').value,
+      topicUrl: document.getElementById('fTopicUrl').value,
+      createdAt: serverTimestamp()
+    });
+    document.getElementById('formSuccess').style.display = 'block';
+  };
 </script>
 </body>
 </html>
