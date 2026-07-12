@@ -109,11 +109,13 @@
   transition: all 0.15s ease;
 }
 
-/* Fix voor de placeholders (deze ontbrak nog en was heel donker) */
+/* Ultieme fix voor de placeholders: forceer volledige zichtbaarheid en een lichtere tint */
 .field input::placeholder {
-  color: var(--ink-dim);
-  opacity: 0.6; /* Zorgt dat de placeholder subtiel is, maar wel leesbaar */
+  color: #a495b8 !important;
+  opacity: 1 !important;
 }
+.field input::-webkit-input-placeholder { color: #a495b8; opacity: 1; }
+.field input::-moz-placeholder { color: #a495b8; opacity: 1; }
 
 .field input:focus { 
   border-color: var(--purple-glow); 
