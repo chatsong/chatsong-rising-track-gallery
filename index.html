@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,12 +33,16 @@
   .tile-title { font-size:1.3rem; font-weight:700; line-height: 1.2; margin-bottom: 6px; color: #fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .tile-artist { font-size:0.95rem; color:var(--purple-glow); font-weight: 500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   
-  /* Action row (Likes + Chat) */
-  .tile-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+  /* Action row (Upvote + Chat) */
+  .tile-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; gap: 8px; }
   
-  .like-badge { display: flex; align-items: center; gap: 6px; background: rgba(255,46,136,0.1); border: 1px solid rgba(255,46,136,0.2); color: var(--magenta); font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 6px 12px; border-radius: 20px; font-weight: 700; }
+  /* Interactieve Upvote Knop */
+  .upvote-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,46,136,0.1); border: 1px solid rgba(255,46,136,0.3); color: var(--magenta); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 6px 12px; border-radius: 20px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; user-select: none; }
+  .upvote-btn:hover { background: rgba(255,46,136,0.25); transform: scale(1.05); }
+  .upvote-btn:active { transform: scale(0.95); }
+  .upvote-btn.voted { background: var(--magenta); color: #fff; border-color: var(--magenta); cursor: default; transform: none; }
   
-  .chatsong-btn { font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background: var(--purple); text-decoration:none; padding: 6px 14px; border-radius:8px; font-weight: 500; transition: background 0.2s; }
+  .chatsong-btn { font-family:'JetBrains Mono', monospace; font-size:12px; color:#fff; background: var(--purple); text-decoration:none; padding: 6px 14px; border-radius:8px; font-weight: 500; transition: background 0.2s; white-space: nowrap; }
   .chatsong-btn:hover { background: var(--purple-glow); }
 
   /* Compact embed container at the bottom */
@@ -48,14 +53,14 @@
 <div class="wrap">
   <header>
     <h1>Rising Tracks <span>Showcase</span></h1>
-    <p>Discover fresh tracks curated and upvoted by the community</p>
+    <p>Discover fresh tracks curated, upvoted, and hyped by the community</p>
   </header>
   <div class="grid" id="grid"></div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
   const app = initializeApp({
     apiKey: "AIzaSyCO7DtGmr80FVgiUt3DUCl-PLF58MNk160",
@@ -67,28 +72,27 @@
   });
   const db = getFirestore(app);
 
-  function getEmbedHtml(url, containerId) {
+  // Houdt lokaal bij op welke tracks de gebruiker al gestemd heeft
+  let votedTracks = JSON.parse(localStorage.getItem('chatsong_voted_tracks')) || [];
+
+  function getEmbedHtml(url) {
     if (!url) return '<div style="padding:16px; color:var(--ink-dim); font-size:13px;">No link available</div>';
     
-    // 1. Spotify
     if (url.includes('spotify.com')) {
         const cleanUrl = url.split('?')[0].replace('spotify.com/', 'spotify.com/embed/');
         return `<iframe src="${cleanUrl}" width="100%" height="80" frameborder="0" allow="encrypted-media" style="border:0; display:block;"></iframe>`;
     }
     
-    // 2. SoundCloud
     if (url.includes('soundcloud.com')) {
         return `<iframe width="100%" height="20" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%239b59b6&auto_play=false&inverse=true&style=compact" style="border:0; display:block; height:30px; margin: 10px 0;"></iframe>`;
     }
     
-    // 3. YouTube
     if (url.includes('youtu')) {
         let id = '';
         if (url.includes('v=')) { id = url.split('v=')[1].split('&')[0]; } else { id = url.split('/').pop().split('?')[0]; }
         return `<iframe width="100%" height="160" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen style="border:0; display:block;"></iframe>`;
     }
 
-    // 4. Mixcloud
     if (url.includes('mixcloud.com')) {
         const path = url.split('mixcloud.com')[1].split('?')[0];
         return `<iframe width="100%" height="60" src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=0&feed=${encodeURIComponent(path)}" frameborder="0" style="border:0; display:block;"></iframe>`;
@@ -97,7 +101,29 @@
     return `<div style="padding:16px; text-align:center;"><a href="${url}" target="_blank" style="color:var(--purple-glow); font-size:13px; text-decoration: none;">Listen to Track ↗</a></div>`;
   }
 
-  // Load live data from Firestore
+  // Functie om te upvoten in Firebase
+  window.upvoteTrack = async function(trackId, buttonElement) {
+    if (votedTracks.includes(trackId)) return; // Voorkom dubbel stemmen
+
+    try {
+      const trackRef = doc(db, 'tracks', trackId);
+      // Verhoog de 'likes' teller direct in Firestore met +1
+      await updateDoc(trackRef, {
+        likes: increment(1)
+      });
+
+      // Sla op in localStorage zodat de knop "VOTED" blijft
+      votedTracks.push(trackId);
+      localStorage.setItem('chatsong_voted_tracks', JSON.stringify(votedTracks));
+      
+      buttonElement.classList.add('voted');
+      buttonElement.innerHTML = `✓ VOTED`;
+    } catch (error) {
+      console.error("Error upvoting track: ", error);
+    }
+  };
+
+  // Load live data en sorteer op de meeste upvotes (likes)
   onSnapshot(query(collection(db, 'tracks'), orderBy('likes', 'desc')), (snapshot) => {
     const grid = document.getElementById('grid');
     grid.innerHTML = '';
@@ -107,13 +133,13 @@
       return;
     }
 
-    snapshot.docs.forEach((doc, index) => {
+    snapshot.docs.forEach((doc) => {
       const t = { id: doc.id, ...doc.data() };
       const tile = document.createElement('div');
       tile.className = 'tile';
-      const containerId = `embed-${index}`;
       
       const likeCount = t.likes !== undefined ? t.likes : 0;
+      const hasVoted = votedTracks.includes(t.id);
 
       tile.innerHTML = `
         <div class="tile-showcase">
@@ -123,14 +149,16 @@
             </div>
             
             <div class="tile-actions">
-                <div class="like-badge">
-                  <span style="font-size:14px;">🔥</span> ${likeCount} UPVOTES
-                </div>
+                <button 
+                  class="upvote-btn ${hasVoted ? 'voted' : ''}" 
+                  onclick="upvoteTrack('${t.id}', this)">
+                  ${hasVoted ? '✓ VOTED' : `🔥 ${likeCount} UPVOTES`}
+                </button>
                 ${t.topicUrl ? `<a href="${t.topicUrl}" target="_blank" class="chatsong-btn">Join Chat</a>` : ''}
             </div>
         </div>
-        <div class="embed-container" id="${containerId}">
-            ${getEmbedHtml(t.trackUrl, containerId)}
+        <div class="embed-container">
+            ${getEmbedHtml(t.trackUrl)}
         </div>
       `;
       
