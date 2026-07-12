@@ -48,8 +48,8 @@
   .tile:hover{ transform:translateY(-8px); border-color:var(--purple-glow); box-shadow: 0 12px 32px rgba(155,89,182,0.25); }
    
   /* Top element: Artist Showcase Card */
-  .tile-showcase { padding:24px; background: linear-gradient(to bottom, rgba(155,89,182,0.05), transparent); flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; }
-  .track-meta { min-width: 0; }
+  .tile-showcase { padding:24px; background: linear-gradient(to bottom, rgba(155,89,182,0.05), transparent); flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; position: relative; }
+  .track-meta { min-width: 0; padding-right: 40px; /* Ruimte voor de badge */ }
   .tile-title { font-size:1.3rem; font-weight:700; line-height: 1.2; margin-bottom: 6px; color: #fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .tile-artist { font-size:0.95rem; color:var(--purple-glow); font-weight: 500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
    
@@ -68,6 +68,47 @@
   /* Compact embed container at the bottom */
   .embed-container { width:100%; background:rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.05); }
 
+  /* BADGE SYSTEM CSS */
+  .tier-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  
+  .tier-silver {
+    background: linear-gradient(135deg, #a8a8a8, #d4d4d4);
+    color: #1a1a1a;
+    border: 1px solid #ffffff;
+    box-shadow: 0 0 10px rgba(212, 212, 212, 0.4);
+  }
+  
+  .tier-gold {
+    background: linear-gradient(135deg, #e6b800, #ffdd33);
+    color: #1a1a1a;
+    border: 1px solid #fff5cc;
+    box-shadow: 0 0 15px rgba(255, 221, 51, 0.5);
+  }
+  
+  .tier-legend {
+    background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+    color: #ffffff;
+    border: 1px solid #80e5ff;
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.6);
+  }
+
   /* Modal Base */
   .modal-bg{
     display:none; position:fixed; inset:0; background:rgba(8,4,13,0.85);
@@ -84,13 +125,13 @@
   }
   .modal-close:hover{ color:var(--ink); }
   .modal h2{ font-size:18px; margin-bottom:14px; padding-right:24px; }
-.field { margin-bottom: 18px; } /* Iets meer ademruimte tussen de velden */
+.field { margin-bottom: 18px; }
 
 .field label {
   display: block; 
   font-family: 'JetBrains Mono', monospace; 
   font-size: 11px;
-  color: var(--purple-glow); /* Labels vallen nu extra op in paars in plaats van vaag grijs */
+  color: var(--purple-glow);
   text-transform: uppercase; 
   letter-spacing: 0.08em; 
   margin-bottom: 6px;
@@ -98,8 +139,8 @@
 
 .field input {
   width: 100%; 
-  background: rgba(255, 255, 255, 0.05); /* Iets lichter gemaakt voor beter contrast */
-  border: 1px solid rgba(155, 89, 182, 0.4); /* Randen iets duidelijker aangezet */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(155, 89, 182, 0.4);
   color: var(--ink); 
   font-family: 'Space Grotesk', sans-serif; 
   font-size: 14px;
@@ -109,7 +150,6 @@
   transition: all 0.15s ease;
 }
 
-/* Ultieme fix voor de placeholders: forceer volledige zichtbaarheid en een lichtere tint */
 .field input::placeholder {
   color: #a495b8 !important;
   opacity: 1 !important;
@@ -119,14 +159,14 @@
 
 .field input:focus { 
   border-color: var(--purple-glow); 
-  background: rgba(255, 255, 255, 0.08); /* Licht op wanneer je erin typt */
-  box-shadow: 0 0 8px rgba(214, 130, 255, 0.2); /* Subtiele glow bij focus */
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 8px rgba(214, 130, 255, 0.2);
 }
 
 .field small { 
   display: block; 
   margin-top: 6px; 
-  color: #bdaecf; /* Handmatig een stuk lichter gemaakt dan --ink-dim, nu perfect leesbaar */
+  color: #bdaecf;
   font-size: 11px; 
   line-height: 1.4;
 }
@@ -219,25 +259,21 @@
  function getEmbedHtml(url) {
     if (!url) return '<div style="padding:16px; color:var(--ink-dim); font-size:13px;">No link available</div>';
     
-    // SPOTIFY: Hoogte 152px is de officiële standaard.
     if (url.includes('spotify.com')) {
         const cleanUrl = url.split('?')[0].replace('spotify.com/', 'spotify.com/embed/');
         return `<iframe src="${cleanUrl}" width="100%" height="152" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" style="border-radius: 0 0 16px 16px; display:block;"></iframe>`;
     }
     
-    // SOUNDCLOUD: Hoogte 166px is de officiële standaard.
     if (url.includes('soundcloud.com')) {
         return `<iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%239b59b6&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false" style="border-radius: 0 0 16px 16px; display:block;"></iframe>`;
     }
     
-    // YOUTUBE: Hoogte 200px geeft een veel mooiere 16:9 verhouding.
     if (url.includes('youtu')) {
         let id = '';
         if (url.includes('v=')) { id = url.split('v=')[1].split('&')[0]; } else { id = url.split('/').pop().split('?')[0]; }
         return `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${id}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius: 0 0 16px 16px; display:block;"></iframe>`;
     }
 
-    // MIXCLOUD: Hoogte 60px is perfect voor hun mini-player.
     if (url.includes('mixcloud.com')) {
         const path = url.split('mixcloud.com')[1].split('?')[0];
         return `<iframe width="100%" height="60" src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=0&feed=${encodeURIComponent(path)}" frameborder="0" style="border-radius: 0 0 16px 16px; display:block;"></iframe>`;
@@ -245,6 +281,7 @@
     
     return `<div style="padding:16px; text-align:center;"><a href="${url}" target="_blank" style="color:var(--purple-glow); font-size:13px; text-decoration: none;">Listen to Track ↗</a></div>`;
   }
+
   window.upvoteTrack = async function(trackId, buttonElement) {
     if (votedTracks.includes(trackId)) return;
 
@@ -282,8 +319,19 @@
       const hasVoted = votedTracks.includes(t.id);
       const upvoteText = likeCount === 1 ? 'UPVOTE' : 'UPVOTES';
 
+      // --- BADGE LOGICA ---
+      let badgeHtml = '';
+      if (likeCount >= 50) {
+        badgeHtml = `<div class="tier-badge tier-legend">💎 Legend</div>`;
+      } else if (likeCount >= 25) {
+        badgeHtml = `<div class="tier-badge tier-gold">🥇 Hit</div>`;
+      } else if (likeCount >= 10) {
+        badgeHtml = `<div class="tier-badge tier-silver">🥈 Rising</div>`;
+      }
+
       tile.innerHTML = `
         <div class="tile-showcase">
+            ${badgeHtml}
             <div class="track-meta">
                 <div class="tile-title" title="${escapeHtml(t.track)}">${escapeHtml(t.track || 'Untitled')}</div>
                 <div class="tile-artist" title="${escapeHtml(t.artist)}">by ${escapeHtml(t.artist || 'Unknown Artist')}</div>
