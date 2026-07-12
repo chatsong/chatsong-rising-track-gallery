@@ -18,7 +18,11 @@
   .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:18px; }
   .tile{ position:relative; background:var(--bg-panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; cursor:pointer; transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
   .tile:hover{ border-color:var(--purple); box-shadow:0 0 0 1px var(--purple), 0 12px 28px -12px rgba(155,89,182,0.5); }
-  .art{ width:100%; aspect-ratio:1/1; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-size:34px; background-color:var(--purple); }
+  
+  /* NIEUW: Embed wrapper in plaats van de oude .art class */
+  .embed-wrapper{ width:100%; aspect-ratio:1/1; background-color:var(--purple); pointer-events:none; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:34px; }
+  .embed-wrapper iframe{ width:100%; height:100%; border:none; }
+  
   .meta{ padding:12px 14px 14px; }
   .track{ font-size:14.5px; font-weight:700; line-height:1.25; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .artist{ font-size:12.5px; color:var(--ink-dim); margin-bottom:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -31,6 +35,7 @@
   .submit-bar{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:28px; padding:16px 18px; background:var(--bg-panel); border:1px solid var(--line); border-radius:10px; }
   .btn-primary{ background:var(--purple); color:#fff; border:none; padding:11px 18px; border-radius:8px; cursor:pointer; font-weight:700; }
   .field{ margin-bottom:14px; }
+  .field label { display:block; margin-bottom:6px; font-size:14px; color:var(--ink-dim); }
   .field input{ width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--line); color:var(--ink); padding:10px 12px; border-radius:7px; }
 </style>
 </head>
@@ -44,29 +49,33 @@
   <div class="grid" id="grid"></div>
 </div>
 
+<!-- Modal voor de speler -->
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <button class="modal-close" id="modalClose">✕</button>
-    <h2 id="modalTrack"></h2>
+    <h2 id="modalTrack" style="font-size:20px; margin-bottom:15px;"></h2>
     <div id="modalEmbed" class="embed-container"></div>
   </div>
 </div>
 
+<!-- Modal voor Submit Formulier -->
 <div class="modal-bg" id="submitBg">
   <div class="modal">
     <button class="modal-close" id="submitClose">✕</button>
-    <h2>Submit Track</h2>
+    <h2 style="margin-bottom:20px;">Submit Track</h2>
     <form id="submitForm">
-      <div class="field"><label>Artist</label><input type="text" id="fArtist" required></div>
-      <div class="field"><label>Track URL</label><input type="url" id="fTrackUrl" required></div>
-      <button type="submit" class="btn-primary" style="width:100%;">Submit</button>
+      <div class="field"><label>Artiest</label><input type="text" id="fArtist" required></div>
+      <div class="field"><label>Track Naam</label><input type="text" id="fTrackName" required></div>
+      <div class="field"><label>Track URL (Spotify/SoundCloud/YT)</label><input type="url" id="fTrackUrl" required></div>
+      <button type="submit" class="btn-primary" style="width:100%; margin-top:10px;">Toevoegen</button>
     </form>
   </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+  // addDoc is toegevoegd om tracks op te kunnen slaan
+  import { getFirestore, collection, onSnapshot, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
   const db = getFirestore(initializeApp({ apiKey: "AIzaSyCO7DtGmr80FVgiUt3DUCl-PLF58MNk160", authDomain: "chatsong-track-gallery.firebaseapp.com", projectId: "chatsong-track-gallery", storageBucket: "chatsong-track-gallery.firebasestorage.app", messagingSenderId: "800320909638", appId: "1:800320909638:web:36cb0f043699c5ef767547" }));
 
@@ -75,34 +84,66 @@
     try {
         const res = await fetch(`https://iframe.ly/api/oembed?url=${encodeURIComponent(url)}&api_key=e8b7d60a5d5c0746401083`);
         return await res.json();
-    } catch (e) { return { thumbnail_url: '', html: '' }; }
+    } catch (e) { return { html: '🎵' }; } // Fallback nootje als het mislukt
   }
 
+  // Luister naar de database en render de tracks
   onSnapshot(query(collection(db, 'tracks'), orderBy('likes', 'desc')), async (snap) => {
     const grid = document.getElementById('grid');
     grid.innerHTML = '';
+    
     for (const doc of snap.docs) {
       const t = { id: doc.id, ...doc.data() };
       const meta = await getTrackMetadata(t.trackUrl);
       
       const tile = document.createElement('div');
       tile.className = 'tile';
+      
+      // Injecteer de iframe in plaats van de losse cover art
       tile.innerHTML = `
-        <div class="art" style="background-image: url('${meta.thumbnail_url || ''}')">${!meta.thumbnail_url ? '🎵' : ''}</div>
+        <div class="embed-wrapper">${meta.html || '🎵'}</div>
         <div class="meta">
-          <div class="track">${t.track}</div>
-          <div class="artist">${t.artist}</div>
-          <button class="like-btn">♥ ${t.likes}</button>
+          <div class="track">${t.track || 'Unknown Track'}</div>
+          <div class="artist">${t.artist || 'Unknown Artist'}</div>
+          <button class="like-btn">♥ ${t.likes || 0}</button>
         </div>`;
+        
       tile.onclick = () => {
         document.getElementById('modalTrack').textContent = t.track;
         document.getElementById('modalEmbed').innerHTML = meta.html;
         document.getElementById('modalBg').classList.add('open');
       };
+      
       grid.appendChild(tile);
     }
   });
 
+  // Functie voor het verzenden van een nieuwe track naar Firebase
+  document.getElementById('submitForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); // Voorkom dat de pagina herlaadt
+    
+    const artist = document.getElementById('fArtist').value;
+    const track = document.getElementById('fTrackName').value;
+    const trackUrl = document.getElementById('fTrackUrl').value;
+
+    try {
+      await addDoc(collection(db, 'tracks'), {
+        artist: artist,
+        track: track,
+        trackUrl: trackUrl,
+        likes: 0 // Start altijd met 0 likes
+      });
+      
+      // Sluit modal en reset formulier
+      document.getElementById('submitBg').classList.remove('open');
+      document.getElementById('submitForm').reset();
+    } catch (error) {
+      console.error("Fout bij toevoegen track: ", error);
+      alert("Er is iets misgegaan bij het toevoegen.");
+    }
+  });
+
+  // Modal bediening
   document.getElementById('modalClose').onclick = () => document.getElementById('modalBg').classList.remove('open');
   document.getElementById('openSubmit').onclick = () => document.getElementById('submitBg').classList.add('open');
   document.getElementById('submitClose').onclick = () => document.getElementById('submitBg').classList.remove('open');
