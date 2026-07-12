@@ -17,9 +17,12 @@
   .wrap{ max-width:1200px; margin:0 auto; }
   
   header{ margin-bottom:56px; text-align: center; }
-  h1 { font-size: 3rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 8px; }
+  h1 { font-size: 3rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 12px; }
   h1 span{ color: transparent; -webkit-text-stroke: 1px var(--purple-glow); background: linear-gradient(135deg, var(--purple-glow), var(--magenta)); -webkit-background-clip: text; background-clip: text; }
-  header p { color: var(--ink-dim); font-size: 1.1rem; }
+  
+  .workflow-steps { color: var(--ink-dim); font-size: 1.15rem; font-weight: 400; max-width: 650px; margin: 0 auto; line-height: 1.5; }
+  .workflow-steps span { color: var(--purple-glow); font-weight: 500; }
+  .workflow-steps strong { color: var(--magenta); font-weight: 500; }
 
   /* Grid configuration */
   .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:28px; }
@@ -36,8 +39,8 @@
   /* Action row (Upvote + Chat) */
   .tile-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; gap: 8px; }
   
-  /* Interactieve Upvote Knop */
-  .upvote-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,46,136,0.1); border: 1px solid rgba(255,46,136,0.3); color: var(--magenta); font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 6px 12px; border-radius: 20px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; user-select: none; }
+  /* Interactive Upvote Button */
+  .upvote-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,46,136,0.1); border: 1px solid rgba(255,46,136,0.3); color: var(--magenta); font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 6px 12px; border-radius: 20px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; user-select: none; }
   .upvote-btn:hover { background: rgba(255,46,136,0.25); transform: scale(1.05); }
   .upvote-btn:active { transform: scale(0.95); }
   .upvote-btn.voted { background: var(--magenta); color: #fff; border-color: var(--magenta); cursor: default; transform: none; }
@@ -53,7 +56,9 @@
 <div class="wrap">
   <header>
     <h1>Rising Tracks <span>Showcase</span></h1>
-    <p>Discover fresh tracks curated, upvoted, and hyped by the community</p>
+    <p class="workflow-steps">
+      <strong>Vote</strong> for your favorite artist and track, then <span>join the chat</span> to write a reply!
+    </p>
   </header>
   <div class="grid" id="grid"></div>
 </div>
@@ -72,7 +77,6 @@
   });
   const db = getFirestore(app);
 
-  // Houdt lokaal bij op welke tracks de gebruiker al gestemd heeft
   let votedTracks = JSON.parse(localStorage.getItem('chatsong_voted_tracks')) || [];
 
   function getEmbedHtml(url) {
@@ -101,18 +105,15 @@
     return `<div style="padding:16px; text-align:center;"><a href="${url}" target="_blank" style="color:var(--purple-glow); font-size:13px; text-decoration: none;">Listen to Track ↗</a></div>`;
   }
 
-  // Functie om te upvoten in Firebase
   window.upvoteTrack = async function(trackId, buttonElement) {
-    if (votedTracks.includes(trackId)) return; // Voorkom dubbel stemmen
+    if (votedTracks.includes(trackId)) return;
 
     try {
       const trackRef = doc(db, 'tracks', trackId);
-      // Verhoog de 'likes' teller direct in Firestore met +1
       await updateDoc(trackRef, {
         likes: increment(1)
       });
 
-      // Sla op in localStorage zodat de knop "VOTED" blijft
       votedTracks.push(trackId);
       localStorage.setItem('chatsong_voted_tracks', JSON.stringify(votedTracks));
       
@@ -123,7 +124,6 @@
     }
   };
 
-  // Load live data en sorteer op de meeste upvotes (likes)
   onSnapshot(query(collection(db, 'tracks'), orderBy('likes', 'desc')), (snapshot) => {
     const grid = document.getElementById('grid');
     grid.innerHTML = '';
@@ -140,6 +140,9 @@
       
       const likeCount = t.likes !== undefined ? t.likes : 0;
       const hasVoted = votedTracks.includes(t.id);
+      
+      // Dynamic text styling for singular vs plural upvotes
+      const upvoteText = likeCount === 1 ? 'UPVOTE' : 'UPVOTES';
 
       tile.innerHTML = `
         <div class="tile-showcase">
@@ -152,9 +155,9 @@
                 <button 
                   class="upvote-btn ${hasVoted ? 'voted' : ''}" 
                   onclick="upvoteTrack('${t.id}', this)">
-                  ${hasVoted ? '✓ VOTED' : `🔥 ${likeCount} UPVOTES`}
+                  ${hasVoted ? '✓ VOTED' : `🔥 ${likeCount} ${upvoteText}`}
                 </button>
-                ${t.topicUrl ? `<a href="${t.topicUrl}" target="_blank" class="chatsong-btn">Join Chat</a>` : ''}
+                ${t.topicUrl ? `<a href="${t.topicUrl}" target="_blank" class="chatsong-btn" title="Join the conversation and write a reply">Write Reply</a>` : ''}
             </div>
         </div>
         <div class="embed-container">
